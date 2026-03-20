@@ -506,7 +506,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string>('');
   const [charId, setCharId] = useState<string>('');
-  const [feedId, setFeedId] = useState<string>('');
+  const [feedId, setFeedId] = useState<number>(-1);
   const [source, setSource] = useState<string>('default');
   const [charName, setCharName] = useState<string>('');
   const [isEditing, setIsEditing] = useState(false);
@@ -600,7 +600,7 @@ function App() {
     const urlParams = new URLSearchParams(window.location.search);
     const charId = urlParams.get('char_id') || 'default2';
     const source = urlParams.get('source') || 'default';
-    const feedId = urlParams.get('feed_id') || '0';
+    const feedId = parseInt(urlParams.get('feed_id') || '-1') || -1;
     setCharId(charId);
     setSource(source);
     setFeedId(feedId);
@@ -950,8 +950,9 @@ function App() {
       if (!response.ok) throw new Error(`搜索角色失败: ${response.status}`);
       const data = await response.json();
       if (data.data && Array.isArray(data.data)) {
+        console.log('搜索结果原始数据:', data.data);
         setSearchResults(data.data.map((item: any) => ({
-          char_id: item.char_id,
+          char_id: item.char_id || item.id || '',
           name: item.name || item.text || '未命名',
           avatar: item.img_src || item.avatar || '',
           description: item.description || ''
@@ -973,7 +974,7 @@ function App() {
     if (charId) {
       const url = new URL(window.location.href);
       url.searchParams.set('switch_to_char_id', charId);
-      //console.log('Navigating to:', url.toString());
+      console.log('Navigating to:', url.toString());
       window.location.href = url.toString();
     } else {
       console.log('switchToCharacter: charId is empty');
@@ -1165,7 +1166,7 @@ function App() {
     };
   }, []);
 
-  const loadInitialChat = async (charId: string, sessionId: string, source: string, feedId: string) => {
+  const loadInitialChat = async (charId: string, sessionId: string, source: string, feedId: number) => {
     setIsLoading(true);
     setError(null);
     setCharId(charId);
@@ -1800,7 +1801,7 @@ function App() {
 
   // 处理切换到下一个角色
   const handleSwitchNextCharacter = useCallback(() => {
-    const currentFeedId = parseInt(feedId) || 0;
+    const currentFeedId = feedId || -1;
     const nextFeedId = currentFeedId + 1;
 
     // 构建新的 URL，feed_id + 1
@@ -2054,7 +2055,10 @@ function App() {
                           <div
                             key={char.char_id}
                             className="flex items-center gap-3 p-3 bg-slate-800 rounded-lg cursor-pointer hover:bg-slate-700 transition-colors"
-                            onClick={() => switchToCharacter(char.char_id)}
+                            onClick={() => {
+                              console.log('点击角色行:', char.char_id, char.name);
+                              switchToCharacter(char.char_id);
+                            }}
                           >
                             <Avatar className="w-10 h-10">
                               <AvatarImage src={char.avatar} />
@@ -2068,7 +2072,16 @@ function App() {
                                 <p className="text-xs text-slate-400 truncate">{char.description}</p>
                               )}
                             </div>
-                            <Button size="sm" variant="ghost" className="text-blue-400 hover:text-blue-300">
+                            <Button 
+                              size="sm" 
+                              variant="ghost" 
+                              className="text-blue-400 hover:text-blue-300"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                console.log('切换按钮点击, char_id:', char.char_id);
+                                switchToCharacter(char.char_id);
+                              }}
+                            >
                               切换
                             </Button>
                           </div>
