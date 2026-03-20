@@ -1,0 +1,224 @@
+/* 沉浸式聊天样式 */
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 2px;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* 打字机动画 */
+@keyframes typing {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.typing-dot {
+  animation: typing 1s ease-in-out infinite;
+}
+
+/* 消息气泡动画 */
+@keyframes messageIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-bubble {
+  animation: messageIn 0.3s ease-out;
+}
+
+/* 背景过渡动画 */
+.background-transition {
+  transition: opacity 0.5s ease-in-out;
+}
+
+/* 角色立绘淡入动画 */
+@keyframes characterFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.character-stand {
+  animation: characterFadeIn 0.8s ease-out;
+}
+
+/* 玻璃态效果增强 */
+.glass-effect {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 输入框焦点效果 */
+.input-focus-ring:focus-within {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+/* 按钮悬停光效 */
+.btn-glow:hover {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+}
+
+/* 渐变文字 */
+.gradient-text {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 视频背景优化 */
+video {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+/* 防止图片拖拽 */
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .character-stand {
+    height: 60vh !important;
+  }
+}
+
+/* 暗色主题对话框覆盖 */
+[data-state="open"] > [data-radix-dialog-content] {
+  background: rgba(15, 23, 42, 0.95) !important;
+}
+
+/* Markdown 样式 */
+.prose-invert {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.prose-invert h1,
+.prose-invert h2,
+.prose-invert h3,
+.prose-invert h4,
+.prose-invert h5,
+.prose-invert h6 {
+  color: rgba(255, 255, 255, 0.95);
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose-invert p {
+  margin-bottom: 0.75em;
+  line-height: 1.7;
+}
+
+.prose-invert ul,
+.prose-invert ol {
+  margin-left: 1.5em;
+  margin-bottom: 0.75em;
+}
+
+.prose-invert li {
+  margin-bottom: 0.25em;
+}
+
+.prose-invert code {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.prose-invert pre {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.prose-invert pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.prose-invert blockquote {
+  border-left: 4px solid rgba(255, 255, 255, 0.2);
+  padding-left: 1em;
+  margin-left: 0;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.prose-invert a {
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+.prose-invert a:hover {
+  text-decoration: underline;
+}
+
+.prose-invert hr {
+  border-color: rgba(255, 255, 255, 0.1);
+  margin: 1.5em 0;
+}
+
+.prose-invert table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1em;
+}
+
+.prose-invert th,
+.prose-invert td {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.5em;
+  text-align: left;
+}
+
+.prose-invert th {
+  background: rgba(255, 255, 255, 0.05);
+}

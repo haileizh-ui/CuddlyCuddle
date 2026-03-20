@@ -1,0 +1,1011 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="apple-touch-icon" sizes="180x180" href="/character/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="192x192" href="/character/android-chrome-192x192.png">
+        <link rel="icon" type="image/png" sizes="512x512" href="/character/android-chrome-512x512.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/character/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/character/favicon-16x16.png">
+        <link rel="manifest" href="/character/site.webmanifest">
+        <title>CuddlyCuddle: Chat with Anyone You See</title>
+<style>
+/* ===== 字体引入 ===== */
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400&display=swap');
+
+/* ===== CSS 变量定义 ===== */
+:root {
+  --bg-color: #0a0e27;
+  --primary-glow: #00d9ff;
+  --secondary-glow: #ff2a6d;
+  --text-color: #e0e0e0;
+  --border-color: rgba(0, 217, 255, 0.3);
+  --container-bg: rgba(15, 20, 52, 0.85);
+}
+
+/* ===== 全局基础与换行规则 ===== */
+.cookii-ui-wrapper * {
+  box-sizing: border-box;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.cookii-ui-wrapper {
+  background-color: var(--bg-color);
+  font-family: 'Noto Sans SC', sans-serif;
+  color: var(--text-color);
+  padding: 20px;
+  position: relative;
+  overflow: hidden; /* 关键：防止特效溢出 */
+  border-radius: 15px;
+}
+
+/* ===== 动态背景：数据流效果 ===== */
+#data-stream-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.glyph {
+  position: absolute;
+  color: var(--primary-glow);
+  font-family: 'Rajdhani', monospace;
+  font-size: 14px;
+  opacity: 0;
+  animation: fall linear infinite;
+  user-select: none;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-200px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.7;
+  }
+  90% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(800px); /* ⚠️ 关键：使用固定像素值 */
+    opacity: 0;
+  }
+}
+
+/* ===== 主容器与标题 ===== */
+.container {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+  animation: fadeIn 1s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 2.5em;
+  font-weight: 700;
+  color: var(--primary-glow);
+  text-shadow: 0 0 15px var(--primary-glow), 0 0 25px var(--primary-glow);
+  letter-spacing: 4px;
+  margin: 10px 0;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  font-size: 1em;
+  color: var(--text-color);
+  opacity: 0.8;
+  margin-bottom: 30px;
+  letter-spacing: 1px;
+}
+
+/* ===== 搜索表单 ===== */
+.search-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 40px;
+  animation: slideInUp 0.8s ease-out 0.2s backwards;
+}
+
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(50px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* 移动端优先的响应式搜索框样式 */
+#char-query {
+  flex-grow: 1;
+  background: var(--container-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 16px; /* 使用固定尺寸避免缩放问题 */
+  color: var(--text-color);
+  font-family: 'Noto Sans SC', sans-serif;
+  transition: all 0.3s ease;
+  outline: none;
+  min-height: 30px; /* 确保触摸友好 */
+  box-sizing: border-box;
+}
+
+#char-query::placeholder {
+  color: rgba(224, 224, 224, 0.5);
+}
+
+#char-query:focus {
+  border-color: var(--primary-glow);
+  box-shadow: 0 0 10px rgba(0, 217, 255, 0.4);
+}
+
+#search-btn {
+  background: linear-gradient(45deg, var(--secondary-glow), var(--primary-glow));
+  border: none;
+  border-radius: 6px;
+  padding: 0 20px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #0a0e27;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-height: 30px; /* 与输入框保持一致高度 */
+  white-space: nowrap; /* 防止文字换行 */
+}
+
+#search-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 217, 255, 0.3);
+}
+
+#search-btn:active {
+  transform: translateY(0);
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  #char-query {
+    padding: 10px 14px;
+    font-size: 16px; /* 保持足够大便于阅读 */
+    border-radius: 8px;
+    width: 100%; /* 占据全部可用宽度 */
+    margin-bottom: 10px; /* 与按钮间距 */
+  }
+
+  #search-btn {
+    padding: 12px 20px;
+    font-size: 16px;
+    width: 100%; /* 按钮也全宽度 */
+    border-radius: 8px;
+  }
+
+  /* 如果容器使用flex布局，改为垂直排列 */
+  .search-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* 超小屏幕进一步优化 */
+@media (max-width: 480px) {
+  #char-query {
+    padding: 12px 16px;
+    font-size: 16px; /* 重要：保持16px避免iOS缩放 */
+  }
+
+  #search-btn {
+    padding: 14px 20px;
+    font-size: 16px;
+  }
+}
+
+/* ===== 新增：图片上传区域 ===== */
+#upload-container {
+  color: rgba(224, 224, 224, 0.6);
+  padding: 60px 20px;
+  font-size: 1.2em;
+  letter-spacing: 2px;
+  border: 2px dashed var(--border-color);
+  border-radius: 10px;
+  text-align: center;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  cursor: pointer;
+}
+
+#upload-container.dragover {
+  background-color: rgba(0, 217, 255, 0.1);
+  border-color: var(--primary-glow);
+  color: var(--primary-glow);
+}
+
+.upload-label {
+  display: inline-block;
+  background: var(--container-bg);
+  border: 1px solid var(--border-color);
+  padding: 12px 25px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 1.1em;
+  color: var(--text-color);
+  transition: all 0.3s ease;
+}
+
+.upload-label:hover {
+  background-color: var(--primary-glow);
+  color: var(--bg-color);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 217, 255, 0.3);
+}
+
+#upload-container p {
+  font-size: 0.9em;
+  margin: 0;
+  pointer-events: none; /* 防止P标签干扰拖拽事件 */
+}
+
+
+/* ===== 结果展示区 ===== */
+#results-container {
+  background: var(--container-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+table {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.5em;
+  padding-bottom: 15px;
+  color: var(--primary-glow);
+  text-shadow: 0 0 10px var(--primary-glow);
+  letter-spacing: 2px;
+}
+
+td {
+  padding: 10px;
+  vertical-align: top;
+}
+
+/* 图片容器 - 相对定位用于放置点赞数 */
+.char-img-container {
+  position: relative;
+  display: block;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.char-img-container:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 20px var(--primary-glow);
+}
+
+td a {
+  display: block;
+  text-decoration: none;
+}
+
+td img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4; /* 保持图片比例 */
+  object-fit: cover;
+  display: block;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: #1a1f35; /* 图片加载前背景色 */
+}
+
+/* 点赞数样式 - 右下角 */
+.like-count {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: linear-gradient(135deg, rgba(255, 42, 109, 0.9), rgba(255, 42, 109, 0.7));
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9em;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 2px 10px rgba(255, 42, 109, 0.4);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.char-img-container:hover .like-count {
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(255, 42, 109, 0.6);
+}
+
+/* 心形图标 */
+.like-count::before {
+  content: "♥";
+  font-size: 1.1em;
+  color: #fff;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+td .design-char-button {
+  display: block;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  border: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: none; /* 确保按钮背景透明 */
+}
+
+td .design-char-button:hover {
+  transform: scale(1.03);
+  padding: 0;
+  border: none;
+  box-shadow: 0 0 20px var(--primary-glow);
+}
+
+/* 图片加载动画 */
+.loading-placeholder {
+  position: relative;
+  background: linear-gradient(90deg, #1a1f35 25%, #2a2f45 50%, #1a1f35 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+
+/* ===== 分页控制 ===== */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  margin-top: 1px;
+  flex-wrap: wrap;
+}
+
+.page-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.page-btn:hover:not(:disabled) {
+  background-color: var(--primary-glow);
+  color: var(--bg-color);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 217, 255, 0.3);
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 当前页码样式 */
+.page-btn.current {
+  background-color: var(--primary-glow);
+  color: var(--bg-color);
+  cursor: default;
+  opacity: 1;
+  transform: none;
+  box-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+}
+
+.gen_image_btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1em;
+  font-weight: 600;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.gen_image_btn:hover:not(:disabled) {
+  background-color: var(--primary-glow);
+  color: var(--bg-color);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 217, 255, 0.3);
+}
+
+.gen_image_btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+#page-info {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.2em;
+  color: var(--primary-glow);
+  text-shadow: 0 0 5px var(--primary-glow);
+}
+
+.markdown-container {
+    box-sizing: border-box;
+    min-width: 200px;
+    max-width: 980px; /* 控制阅读舒适宽度 */
+    margin: 0; /* 显示 */
+    padding: 45px;
+    text-align: left;
+}
+
+/* ===== Tab 选项卡系统 ===== */
+.tab-container {
+  margin-top: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tab-nav {
+  display: flex;
+  background-color: rgba(0,0,0,0.2);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 15px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-color);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.2em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.tab-btn:hover {
+  background-color: rgba(0, 217, 255, 0.1);
+}
+
+.tab-btn.active {
+  color: var(--primary-glow);
+  border-bottom-color: var(--primary-glow);
+  text-shadow: 0 0 10px var(--primary-glow);
+}
+
+.tab-panel {
+  display: none;
+  animation: tabFadeIn 0.5s ease;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+@keyframes tabFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+#tab-panel-image {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 30px;
+}
+
+.adaptive-img {
+  width: 99%; /* 让图片宽度填满容器（减去padding） */
+  height: 900px; /* ！！！关键：必须设置一个明确的高度（或通过容器限制）！！！ */
+  object-fit: contain; /* 核心属性 */
+}
+
+/* 移动端适配 */
+@media (max-width: 767px) {
+    .markdown-container {
+        padding: 15px;
+    }
+
+    .tab-btn {
+      font-size: 1em;
+  }
+}
+
+/* ===== 移动端边距优化 ===== */
+.cookii-ui-wrapper {
+  padding: 12px 10px; /* 减少移动端整体边距 */
+}
+
+.container {
+  /* 移除固定padding，使用相对单位 */
+  padding: 0 5px; /* 进一步减少容器内边距 */
+}
+
+/* 移动端适配 - 优化边距 */
+@media (max-width: 768px) {
+  .cookii-ui-wrapper {
+    padding: 10px 8px; /* 移动端更紧凑的边距 */
+  }
+
+  .container {
+    padding: 0 3px; /* 移动端极简化内边距 */
+  }
+
+  .title {
+    font-size: 1.8em; /* 减小标题大小 */
+    margin: 8px 0; /* 减少标题边距 */
+    letter-spacing: 2px; /* 减少字间距 */
+  }
+
+  .subtitle {
+    font-size: 0.9em;
+    margin-bottom: 20px; /* 减少副标题下边距 */
+  }
+
+  .search-form {
+    margin-bottom: 25px; /* 减少搜索表单下边距 */
+    gap: 8px; /* 缩小表单项间距 */
+  }
+
+  #results-container {
+    padding: 12px 8px; /* 减少结果容器内边距 */
+    margin: 8px 0; /* 减少结果容器外边距 */
+  }
+
+  .markdown-container {
+    padding: 20px 12px; /* 减少markdown容器内边距 */
+  }
+
+  .tab-container {
+    margin-top: 8px; /* 减少选项卡上边距 */
+  }
+
+  .tab-panel {
+    padding: 15px 8px; /* 减少选项卡面板内边距 */
+  }
+}
+
+/* 超小屏幕进一步优化 */
+@media (max-width: 480px) {
+  .cookii-ui-wrapper {
+    padding: 8px 5px; /* 超小屏幕极简边距 */
+  }
+
+  .container {
+    padding: 0 2px;
+  }
+
+  .title {
+    font-size: 1.5em;
+    margin: 5px 0;
+    letter-spacing: 1px;
+  }
+
+  .subtitle {
+    font-size: 0.8em;
+    margin-bottom: 15px;
+  }
+
+  #results-container {
+    padding: 8px 5px;
+    margin: 5px 0;
+  }
+
+  .markdown-container {
+    padding: 15px 8px;
+  }
+}
+
+/* 使用相对单位替代固定像素 */
+@media (max-width: 768px) {
+  .pagination-controls {
+    margin-top: 0.5rem; /* 使用相对单位 */
+    gap: 0.3rem;
+  }
+
+  .page-btn {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8em;
+  }
+}
+
+/* 优化图片容器的边距 */
+@media (max-width: 768px) {
+  #tab-panel-image {
+    padding: 15px 5px; /* 减少图片面板内边距 */
+    gap: 10px; /* 缩小元素间距 */
+  }
+
+  .adaptive-img {
+    margin: 5px 0; /* 减少图片边距 */
+  }
+}
+
+/* 页码数字按钮容器 */
+.page-numbers {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* 页码数字按钮 */
+.page-number-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 36px;
+}
+
+.page-number-btn:hover:not(.current) {
+  background-color: var(--primary-glow);
+  color: var(--bg-color);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 217, 255, 0.3);
+}
+
+.page-number-btn.current {
+  background-color: var(--primary-glow);
+  color: var(--bg-color);
+  cursor: default;
+  opacity: 1;
+  transform: none;
+  box-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+}
+
+/* 移动端点赞数适配 */
+@media (max-width: 768px) {
+  .like-count {
+    padding: 4px 8px;
+    font-size: 0.8em;
+    bottom: 8px;
+    right: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .like-count {
+    padding: 3px 6px;
+    font-size: 0.75em;
+    bottom: 6px;
+    right: 6px;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- 状态变量 ---
+    let page = 1;
+    let total_count = 0;
+    let total_page = 0;
+    let page_size = 6;
+    let results = []; //角色列表
+
+    // --- 动态背景 ---
+    const streamContainer = document.getElementById('data-stream-effect');
+    if (streamContainer) {
+        const glyphs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>/?;:"|[]{}=+-_*&^%$#@!';
+        const createGlyph = () => {
+            const glyph = document.createElement('span');
+            glyph.className = 'glyph';
+            glyph.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+            glyph.style.left = Math.random() * 100 + 'vw';
+            glyph.style.animationDuration = Math.random() * 5 + 5 + 's';
+            glyph.style.animationDelay = Math.random() * 3 + 's';
+            streamContainer.appendChild(glyph);
+            setTimeout(() => { glyph.remove(); }, 10000);
+        };
+        setInterval(createGlyph, 100);
+    }
+
+    const resultsContainer = document.getElementById('results-container');
+    const paginationControls = document.getElementById('pagination-controls'); // 新增
+
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const curPage = document.getElementById('page-info');
+    const pageNumbersContainer = document.getElementById('page-numbers');
+
+    prevBtn.addEventListener('click', () => {
+        if (page > 1) {
+            page--;
+            updateResultsUI();
+            updatePaginationControls();
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (page < total_page) {
+            page++;
+            updateResultsUI();
+            updatePaginationControls();
+        }
+    });
+
+    // 点击页码数字
+    const handlePageNumberClick = (pageNum) => {
+        if (pageNum !== page && pageNum >= 1 && pageNum <= total_page) {
+            page = pageNum;
+            updateResultsUI();
+            updatePaginationControls();
+        }
+    };
+
+    // 辅助函数：更新单个角色卡片
+    const updateCharCard = (index, charData) => {
+        const img = document.getElementById(`charillu${index}`);
+        const link = document.getElementById(`chat_char${index}`);
+        const likeCount = document.getElementById(`like-count-${index}`);
+        
+        if (charData) {
+            img.src = charData.img_src;
+            img.title = charData.text;
+            link.href = "https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(charData.char_id);
+            
+            // 更新点赞数 
+            const likes = charData.like_count || 0;
+            likeCount.textContent = formatNumber(likes);
+            likeCount.style.display = 'flex';
+        } else {
+            img.src = '';
+            img.title = '';
+            link.href = '';
+            likeCount.style.display = 'none';
+        }
+    };
+
+    // 格式化数字（超过1000显示为1k）
+    const formatNumber = (num) => {
+        if (num >= 1000000) {
+            return (num / 1000000).toFixed(1) + 'M';
+        } else if (num >= 1000) {
+            return (num / 1000).toFixed(1) + 'k';
+        }
+        return num.toString();
+    };
+
+    const updateResultsUI = () => {
+        fetch(`https://danime.dawoai.com/v1/dialogue/character_list?page=${page}&page_size=${page_size}&query=chars&d=1`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // 3. 更新UI
+                total_count = data.total;
+                total_page = data.total_pages;
+                page = data.page;
+                page_size = data.page_size;
+
+                // 更新6个角色卡片
+                for (let i = 0; i < 6; i++) {
+                    updateCharCard(i + 1, data.data && data.data[i] ? data.data[i] : null);
+                }
+            })
+            .catch(error => {
+                console.error('load character_list fail: ', error);
+                resultsContainer.style.display = 'none';
+                // 可以添加一个错误提示
+            });
+    };
+
+    const updateDataUI = () => {
+        fetch(`https://danime.dawoai.com/v1/dialogue/character_list?page=${page}&page_size=${page_size}&query=chars&d=1`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // 3. 更新UI
+                    results = data.data;
+                    total_count = data.total_count;
+                    page = 1;
+                    total_page = data.total_pages;
+
+                    // 更新6个角色卡片
+                    for (let i = 0; i < 6; i++) {
+                        updateCharCard(i + 1, data.data && data.data[i] ? data.data[i] : null);
+                    }
+
+                    updatePaginationControls();
+                })
+                .catch(error => {
+                console.error('load character_list fail: ', error);
+                resultsContainer.style.display = 'none';
+                // 可以添加一个错误提示
+            });
+    };
+
+    updateDataUI();
+
+    // --- UI 更新函数 ---
+    const updatePaginationControls = () => {
+        if (total_page > 0) {
+            curPage.textContent = ` 共${total_page}页`;
+            prevBtn.disabled = page <= 1;
+            nextBtn.disabled = page >= total_page;
+
+            // 更新页码数字按钮
+            updatePageNumbers();
+        } else {
+            curPage.textContent = '';
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
+            pageNumbersContainer.innerHTML = '';
+        }
+    };
+
+    // 更新页码数字按钮
+    const updatePageNumbers = () => {
+        pageNumbersContainer.innerHTML = '';
+
+        if (total_page <= 1) return;
+
+        // 计算要显示的页码范围
+        let startPage = Math.max(1, page - 4);
+        let endPage = Math.min(total_page, page + 4);
+
+        // 确保最多显示9个页码
+        if (endPage - startPage + 1 > 9) {
+            if (page - startPage > endPage - page) {
+                startPage = endPage - 8;
+            } else {
+                endPage = startPage + 8;
+            }
+        }
+
+        // 生成页码按钮
+        for (let i = startPage; i <= endPage; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'page-number-btn';
+            btn.textContent = i;
+
+            if (i === page) {
+                btn.classList.add('current');
+            } else {
+                btn.addEventListener('click', () => handlePageNumberClick(i));
+            }
+
+            pageNumbersContainer.appendChild(btn);
+        }
+    };
+});
+</script>
+<base target="_blank">
+</head>
+
+<body>
+<div class="cookii-ui-wrapper">
+  <div id="data-stream-effect"></div>
+  <div class="container">
+    <!--<h1 class="title">CuddlyCuddle</h1>-->
+
+    <div id="results-container" style="display: block;">
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <a id="chat_char1" href="">
+                <div class="char-img-container">
+                  <img src="" id="charillu1" title="" />
+                  <span class="like-count" id="like-count-1">0</span>
+                </div>
+              </a>
+            </td>
+            <td>
+              <a id="chat_char2" href="">
+                <div class="char-img-container">
+                  <img src="" id="charillu2" title=""/>
+                  <span class="like-count" id="like-count-2">0</span>
+                </div>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a id="chat_char3" href="">
+                <div class="char-img-container">
+                  <img src="" id="charillu3" title="" />
+                  <span class="like-count" id="like-count-3">0</span>
+                </div>
+              </a>
+            </td>
+            <td>
+              <a id="chat_char4" href="">
+                <div class="char-img-container">
+                  <img src="" id="charillu4" title=""/>
+                  <span class="like-count" id="like-count-4">0</span>
+                </div>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a id="chat_char5" href="">
+                <div class="char-img-container">
+                  <img src="" id="charillu5" title="" />
+                  <span class="like-count" id="like-count-5">0</span>
+                </div>
+              </a>
+            </td>
+            <td>
+              <a id="chat_char6" href="">
+                <div class="char-img-container">
+                  <img src="" id="charillu6" title=""/>
+                  <span class="like-count" id="like-count-6">0</span>
+                </div>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="pagination-controls" id="pagination-controls">
+        <button id="prev-btn" class="page-btn" disabled>&lt; Prev</button>
+        <div class="page-numbers" id="page-numbers"></div>
+        <button id="next-btn" class="page-btn" disabled>Next &gt;</button>
+        <span id="page-info"></span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

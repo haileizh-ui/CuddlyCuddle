@@ -1,0 +1,904 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="apple-touch-icon" sizes="180x180" href="/character/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="192x192" href="/character/android-chrome-192x192.png">
+        <link rel="icon" type="image/png" sizes="512x512" href="/character/android-chrome-512x512.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/character/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/character/favicon-16x16.png">
+        <link rel="manifest" href="/character/site.webmanifest">
+        <title>CuddlyCuddle: Chat with Anyone You See</title>
+<style>
+/* ===== 字体引入 ===== */
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400&display=swap');
+
+/* ===== CSS 变量定义 ===== */
+:root {
+  --bg-color: #0a0e27;
+  --primary-glow: #00d9ff;
+  --secondary-glow: #ff2a6d;
+  --text-color: #e0e0e0;
+  --border-color: rgba(0, 217, 255, 0.3);
+  --container-bg: rgba(15, 20, 52, 0.85);
+}
+
+/* ===== 全局基础与换行规则 ===== */
+.cookii-ui-wrapper * {
+  box-sizing: border-box;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.cookii-ui-wrapper {
+  background-color: var(--bg-color);
+  font-family: 'Noto Sans SC', sans-serif;
+  color: var(--text-color);
+  padding: 20px;
+  position: relative;
+  overflow: visible;
+  border-radius: 15px;
+  min-height: 100vh;
+}
+
+/* ===== 动态背景：数据流效果 ===== */
+#data-stream-effect {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.glyph {
+  position: absolute;
+  color: var(--primary-glow);
+  font-family: 'Rajdhani', monospace;
+  font-size: 14px;
+  opacity: 0;
+  animation: fall linear infinite;
+  user-select: none;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-200px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.7;
+  }
+  90% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+/* ===== 主容器与标题 ===== */
+.container {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+  animation: fadeIn 1s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 2.5em;
+  font-weight: 700;
+  color: var(--primary-glow);
+  text-shadow: 0 0 15px var(--primary-glow), 0 0 25px var(--primary-glow);
+  letter-spacing: 4px;
+  margin: 10px 0;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  font-size: 1em;
+  color: var(--text-color);
+  opacity: 0.8;
+  margin-bottom: 30px;
+  letter-spacing: 1px;
+}
+
+/* ===== 上传区域样式 ===== */
+#upload-container {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  margin: 0 auto 30px;
+  background: var(--container-bg);
+  border: 2px dashed var(--border-color);
+  border-radius: 15px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+#upload-container:hover {
+  border-color: var(--primary-glow);
+  box-shadow: 0 0 30px rgba(0, 217, 255, 0.2);
+}
+
+#upload-container.dragover {
+  border-color: var(--secondary-glow);
+  background: rgba(255, 42, 109, 0.1);
+  box-shadow: 0 0 30px rgba(255, 42, 109, 0.3);
+}
+
+.upload-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.3em;
+  color: var(--primary-glow);
+  margin-bottom: 10px;
+  display: block;
+}
+
+#upload-container p {
+  color: var(--text-color);
+  opacity: 0.7;
+  font-size: 0.9em;
+  margin: 0;
+}
+
+/* ===== 上传结果区域 ===== */
+#upload-result-container {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  margin: 0 auto 30px;
+  display: none;
+}
+
+.upload-result-card {
+  background: var(--container-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.upload-result-card h3 {
+  font-family: 'Rajdhani', sans-serif;
+  color: var(--primary-glow);
+  margin: 0 0 15px 0;
+  font-size: 1.2em;
+}
+
+.upload-result-card table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.upload-result-card td {
+  text-align: center;
+  padding: 10px;
+}
+
+.design-char-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  display: block;
+}
+
+.design-char-button img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 2px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.design-char-button:hover img {
+  border-color: var(--primary-glow);
+  box-shadow: 0 0 25px rgba(0, 217, 255, 0.4);
+  transform: scale(1.02);
+}
+
+.design-char-button:disabled {
+  cursor: default;
+}
+
+/* ===== 结果展示区 ===== */
+#results-container {
+  background: var(--container-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* 角色网格布局 - 改为单列展示 */
+.char-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 角色卡片样式 */
+.char-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  padding: 15px;
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.char-card:hover {
+  border-color: var(--primary-glow);
+  box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.char-img-container {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.char-img-container:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 20px var(--primary-glow);
+}
+
+.char-card a {
+  display: block;
+  text-decoration: none;
+  width: 100%;
+}
+
+.char-card img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  display: block;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: #1a1f35;
+}
+
+/* 角色名称 */
+.char-name {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.3em;
+  font-weight: 600;
+  color: var(--primary-glow);
+  margin-top: 12px;
+  margin-bottom: 8px;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+}
+
+/* 点赞数样式 */
+.like-count {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: linear-gradient(135deg, rgba(255, 42, 109, 0.9), rgba(255, 42, 109, 0.7));
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9em;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 2px 10px rgba(255, 42, 109, 0.4);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.char-img-container:hover .like-count {
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(255, 42, 109, 0.6);
+}
+
+.like-count::before {
+  content: "♥";
+  font-size: 1.1em;
+  color: #fff;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+/* 加载动画 */
+.loading-placeholder {
+  position: relative;
+  background: linear-gradient(90deg, #1a1f35 25%, #2a2f45 50%, #1a1f35 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* 底部加载提示 - 确保有高度 */
+.loading-trigger {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--primary-glow);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1em;
+  opacity: 0.8;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(0, 217, 255, 0.3);
+  border-top-color: var(--primary-glow);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-trigger p {
+  margin: 0;
+  letter-spacing: 2px;
+}
+
+/* 没有更多数据提示 */
+.end-message {
+  padding: 30px 20px;
+  text-align: center;
+  color: rgba(224, 224, 224, 0.5);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1em;
+  letter-spacing: 2px;
+  border-top: 1px solid var(--border-color);
+  margin-top: 10px;
+}
+
+/* 返回顶部按钮 */
+.back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  background: var(--container-bg);
+  border: 2px solid var(--primary-glow);
+  border-radius: 50%;
+  color: var(--primary-glow);
+  font-size: 1.5em;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.back-to-top:hover {
+  background: var(--primary-glow);
+  color: var(--bg-color);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 20px rgba(0, 217, 255, 0.4);
+}
+
+/* ===== 移动端边距优化 ===== */
+.cookii-ui-wrapper {
+  padding: 12px 10px;
+}
+
+.container {
+  padding: 0 5px;
+}
+
+@media (max-width: 768px) {
+  .cookii-ui-wrapper {
+    padding: 10px 8px;
+  }
+
+  .container {
+    padding: 0 3px;
+  }
+
+  .title {
+    font-size: 1.8em;
+    margin: 8px 0;
+    letter-spacing: 2px;
+  }
+
+  .subtitle {
+    font-size: 0.9em;
+    margin-bottom: 20px;
+  }
+
+  #results-container {
+    padding: 12px 8px;
+    margin: 8px 0;
+  }
+
+  .char-card {
+    padding: 12px;
+  }
+
+  .char-name {
+    font-size: 1.1em;
+  }
+
+  .loading-trigger {
+    padding: 30px 15px;
+    font-size: 1em;
+    min-height: 80px;
+  }
+
+  #upload-container {
+    padding: 30px 15px;
+    margin-bottom: 20px;
+  }
+
+  .upload-label {
+    font-size: 1.1em;
+  }
+}
+
+@media (max-width: 480px) {
+  .cookii-ui-wrapper {
+    padding: 8px 5px;
+  }
+
+  .container {
+    padding: 0 2px;
+  }
+
+  .title {
+    font-size: 1.5em;
+    margin: 5px 0;
+    letter-spacing: 1px;
+  }
+
+  .subtitle {
+    font-size: 0.8em;
+    margin-bottom: 15px;
+  }
+
+  #results-container {
+    padding: 8px 5px;
+    margin: 5px 0;
+  }
+
+  .char-card {
+    padding: 10px;
+    gap: 15px;
+  }
+
+  .back-to-top {
+    width: 40px;
+    height: 40px;
+    bottom: 20px;
+    right: 20px;
+    font-size: 1.2em;
+  }
+
+  #upload-container {
+    padding: 25px 10px;
+  }
+
+  .upload-label {
+    font-size: 1em;
+  }
+}
+
+/* 移动端点赞数适配 */
+@media (max-width: 768px) {
+  .like-count {
+    padding: 4px 8px;
+    font-size: 0.8em;
+    bottom: 8px;
+    right: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .like-count {
+    padding: 3px 6px;
+    font-size: 0.75em;
+    bottom: 6px;
+    right: 6px;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- 状态变量 ---
+    let page = 1;
+    let page_size = 6;
+    let total_page = 0;
+    let isLoading = false;
+    let hasMoreData = true;
+    let allCharacters = [];
+    let observer = null;
+
+    console.log('[Infinite Scroll] 初始化开始');
+
+    // --- 动态背景 ---
+    const streamContainer = document.getElementById('data-stream-effect');
+    if (streamContainer) {
+        const glyphs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>/?;:"|[]{}=+-_*&^%$#@!';
+        const createGlyph = () => {
+            const glyph = document.createElement('span');
+            glyph.className = 'glyph';
+            glyph.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+            glyph.style.left = Math.random() * 100 + 'vw';
+            glyph.style.animationDuration = Math.random() * 5 + 5 + 's';
+            glyph.style.animationDelay = Math.random() * 3 + 's';
+            streamContainer.appendChild(glyph);
+            setTimeout(() => { glyph.remove(); }, 10000);
+        };
+        setInterval(createGlyph, 100);
+    }
+
+    const charGrid = document.getElementById('char-grid');
+    const loadingTrigger = document.getElementById('loading-trigger');
+    const backToTopBtn = document.getElementById('back-to-top');
+
+    const uploadContainer = document.getElementById('upload-container');
+    const imageUploadInput = document.getElementById('image-upload');
+    const uploadResultContainer = document.getElementById('upload-result-container');
+    const char1Img = document.getElementById('charillu1');
+    const designCharBtn = document.getElementById('design_char1');
+
+    console.log('[Infinite Scroll] DOM元素:', { charGrid, loadingTrigger, backToTopBtn });
+
+    // --- 辅助函数 ---
+    const formatNumber = (num) => {
+        if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+        if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+        return num.toString();
+    };
+
+    // --- 图片上传逻辑 ---
+    const handleFileSelect = (file) => {
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                // 1. 在第一个卡片显示上传的图片
+                char1Img.src = e.target.result;
+                char1Img.title = file.name;
+                char1Img.classList.remove('loading-placeholder');
+
+                // 2. 显示上传结果区域，保持上传区域可见
+                uploadResultContainer.style.display = 'block';
+                
+                // 往后端上传图片（POST），获取用户上传的图片文件名
+                const img_base64 = e.target.result;
+                fetch(`https://danime.dawoai.com/v1/image/upload?file_name=${file.name}`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        img_base64: img_base64
+                    })
+                })  
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.code == 0) {
+                        console.log('upload image success: ', data.char_url);
+                        char1Img.src = data.char_url;
+                        char1Img.title = data.char_id;
+                        char1Img.classList.remove('loading-placeholder');
+                        
+                        designCharBtn.disabled = false;
+                        // 更新按钮点击事件
+                        designCharBtn.onclick = () => {
+                            window.location.href = "https://danime.dawoai.com/character/chat.html?source=uploaded&char_id=" + encodeURIComponent(data.char_id);
+                        };
+                    } else {
+                        console.error('upload image fail: ', data.msg);
+                    }
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    // 点击上传
+    uploadContainer.addEventListener('click', () => imageUploadInput.click());
+    imageUploadInput.addEventListener('change', (e) => {
+        handleFileSelect(e.target.files[0]);
+    });
+
+    // 拖拽上传
+    uploadContainer.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadContainer.classList.add('dragover');
+    });
+    uploadContainer.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadContainer.classList.remove('dragover');
+    });
+    uploadContainer.addEventListener('drop', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadContainer.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFileSelect(files[0]);
+        }
+    });
+
+    const createCharCard = (charData) => {
+        const card = document.createElement('div');
+        card.className = 'char-card';
+        
+        // 添加点击事件，在当前页面打开
+        card.addEventListener('click', () => {
+            window.location.href = "https://danime.dawoai.com/character/chat.html?feed_id=" + encodeURIComponent(charData.feed_id) + "&char_id=" + encodeURIComponent(charData.char_id);
+        });
+
+        const imgContainer = document.createElement('div');
+        imgContainer.className = 'char-img-container';
+
+        const img = document.createElement('img');
+        img.src = charData.img_src;
+        img.alt = charData.text;
+        img.title = charData.text;
+        img.loading = "lazy";
+
+        const likeCount = document.createElement('span');
+        likeCount.className = 'like-count';
+        likeCount.textContent = formatNumber(charData.like_count || 0);
+
+        imgContainer.appendChild(img);
+        imgContainer.appendChild(likeCount);
+
+        const name = document.createElement('div');
+        name.className = 'char-name';
+        name.textContent = charData.text;
+
+        card.appendChild(imgContainer);
+        card.appendChild(name);
+
+        return card;
+    };
+
+    const showLoading = () => {
+        if (!loadingTrigger) return;
+        loadingTrigger.innerHTML = '<div class="loading-spinner"></div><p>LOADING...</p>';
+        loadingTrigger.style.display = 'flex';
+    };
+
+    const showEndMessage = () => {
+        if (!loadingTrigger) return;
+        loadingTrigger.innerHTML = '<div class="end-message">—— END ——</div>';
+        loadingTrigger.style.display = 'flex';
+    };
+
+    const hideLoading = () => {
+        if (!loadingTrigger) return;
+        loadingTrigger.style.display = 'none';
+    };
+
+    // --- 加载数据 ---
+    const loadData = async () => {
+        if (isLoading || !hasMoreData) {
+            console.log('[Infinite Scroll] 跳过加载:', { isLoading, hasMoreData });
+            return;
+        }
+
+        isLoading = true;
+        showLoading();
+        console.log('[Infinite Scroll] 开始加载第', page, '页');
+
+        try {
+            const url = `https://danime.dawoai.com/v1/dialogue/character_list?page=${page}&page_size=${page_size}&query=chars&d=1`;
+            console.log('[Infinite Scroll] 请求URL:', url);
+
+            const response = await fetch(url);
+            console.log('[Infinite Scroll] 响应状态:', response.status);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('[Infinite Scroll] 获取数据:', { total: data.total, page: data.page, dataLength: data.data?.length });
+
+            total_page = data.total_pages;
+
+            if (data.data && data.data.length > 0) {
+                data.data.forEach(charData => {
+                    const card = createCharCard(charData);
+                    charGrid.appendChild(card);
+                    allCharacters.push(charData);
+                });
+
+                page++;
+                console.log('[Infinite Scroll] 加载完成，当前页:', page, '总页数:', total_page);
+
+                if (page > total_page) {
+                    hasMoreData = false;
+                    showEndMessage();
+                    if (observer) observer.disconnect();
+                } else {
+                    hideLoading();
+                }
+            } else {
+                hasMoreData = false;
+                showEndMessage();
+                if (observer) observer.disconnect();
+            }
+
+        } catch (error) {
+            console.error('[Infinite Scroll] 加载失败:', error);
+            if (loadingTrigger) {
+                loadingTrigger.innerHTML = '<div style="color: #ff2a6d; padding: 20px;"><p>加载失败，请下拉重试</p></div>';
+            }
+        } finally {
+            isLoading = false;
+        }
+    };
+
+    // --- 无限滚动监听 ---
+    const setupObserver = () => {
+        if (!loadingTrigger) {
+            console.error('[Infinite Scroll] loadingTrigger 不存在');
+            return;
+        }
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '200px',
+            threshold: 0
+        };
+
+        observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                console.log('[Infinite Scroll] IntersectionObserver 触发:', entry.isIntersecting, entry.intersectionRatio);
+                if (entry.isIntersecting && !isLoading && hasMoreData) {
+                    console.log('[Infinite Scroll] 触发加载更多');
+                    loadData();
+                }
+            });
+        }, observerOptions);
+
+        observer.observe(loadingTrigger);
+        console.log('[Infinite Scroll] IntersectionObserver 已设置');
+    };
+
+    // --- 返回顶部功能 ---
+    const toggleBackToTop = () => {
+        if (!backToTopBtn) return;
+        if (window.scrollY > 300) {
+            backToTopBtn.classList.add('visible');
+        } else {
+            backToTopBtn.classList.remove('visible');
+        }
+    };
+
+    window.addEventListener('scroll', toggleBackToTop);
+
+    if (backToTopBtn) {
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
+    // --- 初始化 ---
+    console.log('[Infinite Scroll] 开始初始化加载');
+    loadData().then(() => {
+        setupObserver();
+    });
+});
+</script>
+<base target="_blank">
+</head>
+
+<body>
+<div class="cookii-ui-wrapper">
+  <div id="data-stream-effect"></div>
+  
+  <!-- 页面标题 -->
+  <div class="container" style="margin-bottom: 20px;">
+    <h1 class="title">CuddlyCuddle</h1>
+  </div>
+
+  <!-- 上传区域 -->
+  <div id="upload-container">
+    <input type="file" id="image-upload" accept="image/*" style="display: none;" />
+    <div class="upload-label">点"搜索"或者上传图片创作角色</div>
+    <p>或将图片文件拖拽至此区域</p>
+  </div>
+
+  <!-- 上传结果区域 -->
+  <div id="upload-result-container">
+    <div class="upload-result-card">
+      <h3>点图片开始创作角色</h3>
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <button class="design-char-button" id="design_char1" value="" disabled>
+                <img src="" id="charillu1" alt="" title="" class="loading-placeholder" />
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 角色列表区域 -->
+  <div class="container">
+    <div id="results-container">
+      <!-- 角色网格容器 -->
+      <div class="char-grid" id="char-grid"></div>
+
+      <!-- 加载触发器 -->
+      <div class="loading-trigger" id="loading-trigger" style="display: flex;">
+        <div class="loading-spinner"></div>
+        <p>LOADING...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 返回顶部按钮 -->
+  <button class="back-to-top" id="back-to-top" title="返回顶部">↑</button>
+</div>
+</body>
+</html>

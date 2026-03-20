@@ -1,0 +1,1386 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="apple-touch-icon" sizes="180x180" href="/character/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="192x192" href="/character/android-chrome-192x192.png">
+        <link rel="icon" type="image/png" sizes="512x512" href="/character/android-chrome-512x512.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/character/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/character/favicon-16x16.png">
+        <link rel="manifest" href="/character/site.webmanifest">
+        <title>CuddlyCuddle: Chat with Anyone You See</title>
+<style>
+/* ===== 字体引入 ===== */
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400&display=swap');
+
+/* ===== CSS 变量定义 ===== */
+:root {
+  --bg-color: #0a0e27;
+  --primary-glow: #00d9ff;
+  --secondary-glow: #ff2a6d;
+  --text-color: #e0e0e0;
+  --border-color: rgba(0, 217, 255, 0.3);
+  --container-bg: rgba(15, 20, 52, 0.85);
+}
+
+/* ===== 全局基础与换行规则 ===== */
+.cookii-ui-wrapper * {
+  box-sizing: border-box;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.cookii-ui-wrapper {
+  background-color: var(--bg-color);
+  font-family: 'Noto Sans SC', sans-serif;
+  color: var(--text-color);
+  padding: 20px;
+  position: relative;
+  overflow: hidden; /* 关键：防止特效溢出 */
+  border-radius: 15px;
+}
+
+/* ===== 动态背景：数据流效果 ===== */
+#data-stream-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.glyph {
+  position: absolute;
+  color: var(--primary-glow);
+  font-family: 'Rajdhani', monospace;
+  font-size: 14px;
+  opacity: 0;
+  animation: fall linear infinite;
+  user-select: none;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-200px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.7;
+  }
+  90% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(800px); /* ⚠️ 关键：使用固定像素值 */
+    opacity: 0;
+  }
+}
+
+/* ===== 主容器与标题 ===== */
+.container {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+  animation: fadeIn 1s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 2.5em;
+  font-weight: 700;
+  color: var(--primary-glow);
+  text-shadow: 0 0 15px var(--primary-glow), 0 0 25px var(--primary-glow);
+  letter-spacing: 4px;
+  margin: 10px 0;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  font-size: 1em;
+  color: var(--text-color);
+  opacity: 0.8;
+  margin-bottom: 30px;
+  letter-spacing: 1px;
+}
+
+/* ===== 搜索表单 ===== */
+.search-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 40px;
+  animation: slideInUp 0.8s ease-out 0.2s backwards;
+}
+
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(50px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* 移动端优先的响应式搜索框样式 */
+#char-query {
+  flex-grow: 1;
+  background: var(--container-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 16px; /* 使用固定尺寸避免缩放问题 */
+  color: var(--text-color);
+  font-family: 'Noto Sans SC', sans-serif;
+  transition: all 0.3s ease;
+  outline: none;
+  min-height: 30px; /* 确保触摸友好 */
+  box-sizing: border-box;
+}
+
+#char-query::placeholder {
+  color: rgba(224, 224, 224, 0.5);
+}
+
+#char-query:focus {
+  border-color: var(--primary-glow);
+  box-shadow: 0 0 10px rgba(0, 217, 255, 0.4);
+}
+
+#search-btn {
+  background: linear-gradient(45deg, var(--secondary-glow), var(--primary-glow));
+  border: none;
+  border-radius: 6px;
+  padding: 0 20px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #0a0e27;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-height: 30px; /* 与输入框保持一致高度 */
+  white-space: nowrap; /* 防止文字换行 */
+}
+
+#search-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 217, 255, 0.3);
+}
+
+#search-btn:active {
+  transform: translateY(0);
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  #char-query {
+    padding: 10px 14px;
+    font-size: 16px; /* 保持足够大便于阅读 */
+    border-radius: 8px;
+    width: 100%; /* 占据全部可用宽度 */
+    margin-bottom: 10px; /* 与按钮间距 */
+  }
+  
+  #search-btn {
+    padding: 12px 20px;
+    font-size: 16px;
+    width: 100%; /* 按钮也全宽度 */
+    border-radius: 8px;
+  }
+  
+  /* 如果容器使用flex布局，改为垂直排列 */
+  .search-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* 超小屏幕进一步优化 */
+@media (max-width: 480px) {
+  #char-query {
+    padding: 12px 16px;
+    font-size: 16px; /* 重要：保持16px避免iOS缩放 */
+  }
+  
+  #search-btn {
+    padding: 14px 20px;
+    font-size: 16px;
+  }
+}
+
+/* ===== 新增：图片上传区域 ===== */
+#upload-container {
+  color: rgba(224, 224, 224, 0.6);
+  padding: 60px 20px;
+  font-size: 1.2em;
+  letter-spacing: 2px;
+  border: 2px dashed var(--border-color);
+  border-radius: 10px;
+  text-align: center;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  cursor: pointer;
+}
+
+#upload-container.dragover {
+  background-color: rgba(0, 217, 255, 0.1);
+  border-color: var(--primary-glow);
+  color: var(--primary-glow);
+}
+
+.upload-label {
+  display: inline-block;
+  background: var(--container-bg);
+  border: 1px solid var(--border-color);
+  padding: 12px 25px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 1.1em;
+  color: var(--text-color);
+  transition: all 0.3s ease;
+}
+
+.upload-label:hover {
+  background-color: var(--primary-glow);
+  color: var(--bg-color);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 217, 255, 0.3);
+}
+
+#upload-container p {
+  font-size: 0.9em;
+  margin: 0;
+  pointer-events: none; /* 防止P标签干扰拖拽事件 */
+}
+
+
+/* ===== 结果展示区 ===== */
+#results-container {
+  background: var(--container-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+table {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.5em;
+  padding-bottom: 15px;
+  color: var(--primary-glow);
+  text-shadow: 0 0 10px var(--primary-glow);
+  letter-spacing: 2px;
+}
+
+td {
+  padding: 10px;
+  vertical-align: top;
+}
+
+td a {
+  display: block;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+td a:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 20px var(--primary-glow);
+}
+
+td img {
+  width: 100%;
+  height: auto;
+  max-height: 400px; /* 限制最大高度 */
+  object-fit: contain; /* 完整显示图片，不裁剪 */
+  display: block;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: #1a1f35; /* 图片加载前背景色 */
+}
+
+td .design-char-button {
+  display: block;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  border: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: none; /* 确保按钮背景透明 */
+}
+
+td .design-char-button:hover {
+  transform: scale(1.03);
+  padding: 0;
+  border: none;
+  box-shadow: 0 0 20px var(--primary-glow);
+}
+
+/* 图片加载动画 */
+.loading-placeholder {
+  position: relative;
+  background: linear-gradient(90deg, #1a1f35 25%, #2a2f45 50%, #1a1f35 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+
+/* ===== 分页控制 ===== */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  margin-top: 1px;
+}
+
+.page-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.page-btn:hover:not(:disabled) {
+  background-color: var(--primary-glow);
+  color: var(--bg-color);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 217, 255, 0.3);
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.gen_image_btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1em;
+  font-weight: 600;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.gen_image_btn:hover:not(:disabled) {
+  background-color: var(--primary-glow);
+  color: var(--bg-color);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 217, 255, 0.3);
+}
+
+.gen_image_btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+#page-info {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.2em;
+  color: var(--primary-glow);
+  text-shadow: 0 0 5px var(--primary-glow);
+}
+
+.markdown-container {
+    box-sizing: border-box;
+    min-width: 200px;
+    max-width: 980px; /* 控制阅读舒适宽度 */
+    margin: 0; /* 显示 */
+    padding: 45px;
+    text-align: left;
+}
+
+/* ===== Tab 选项卡系统 ===== */
+.tab-container {
+  margin-top: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tab-nav {
+  display: flex;
+  background-color: rgba(0,0,0,0.2);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 15px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-color);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.2em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.tab-btn:hover {
+  background-color: rgba(0, 217, 255, 0.1);
+}
+
+.tab-btn.active {
+  color: var(--primary-glow);
+  border-bottom-color: var(--primary-glow);
+  text-shadow: 0 0 10px var(--primary-glow);
+}
+
+.tab-panel {
+  display: none;
+  animation: tabFadeIn 0.5s ease;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+@keyframes tabFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+#tab-panel-image {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 30px;
+}
+
+.adaptive-img {
+  width: 99%; /* 让图片宽度填满容器（减去padding） */
+  height: 900px; /* ！！！关键：必须设置一个明确的高度（或通过容器限制）！！！ */
+  object-fit: contain; /* 核心属性 */
+}
+
+/* 移动端适配 */
+@media (max-width: 767px) {
+    .markdown-container {
+        padding: 15px;
+    }
+
+    .tab-btn {
+      font-size: 1em;
+  }
+}
+
+/* ===== 移动端边距优化 ===== */
+.cookii-ui-wrapper {
+  padding: 12px 10px; /* 减少移动端整体边距 */
+}
+
+.container {
+  /* 移除固定padding，使用相对单位 */
+  padding: 0 5px; /* 进一步减少容器内边距 */
+}
+
+/* 移动端适配 - 优化边距 */
+@media (max-width: 768px) {
+  .cookii-ui-wrapper {
+    padding: 10px 8px; /* 移动端更紧凑的边距 */
+  }
+  
+  .container {
+    padding: 0 3px; /* 移动端极简化内边距 */
+  }
+  
+  .title {
+    font-size: 1.8em; /* 减小标题大小 */
+    margin: 8px 0; /* 减少标题边距 */
+    letter-spacing: 2px; /* 减少字间距 */
+  }
+  
+  .subtitle {
+    font-size: 0.9em;
+    margin-bottom: 20px; /* 减少副标题下边距 */
+  }
+  
+  .search-form {
+    margin-bottom: 25px; /* 减少搜索表单下边距 */
+    gap: 8px; /* 缩小表单项间距 */
+  }
+  
+  #results-container {
+    padding: 12px 8px; /* 减少结果容器内边距 */
+    margin: 8px 0; /* 减少结果容器外边距 */
+  }
+  
+  .markdown-container {
+    padding: 20px 12px; /* 减少markdown容器内边距 */
+  }
+  
+  .tab-container {
+    margin-top: 8px; /* 减少选项卡上边距 */
+  }
+  
+  .tab-panel {
+    padding: 15px 8px; /* 减少选项卡面板内边距 */
+  }
+}
+
+/* 超小屏幕进一步优化 */
+@media (max-width: 480px) {
+  .cookii-ui-wrapper {
+    padding: 8px 5px; /* 超小屏幕极简边距 */
+  }
+  
+  .container {
+    padding: 0 2px;
+  }
+  
+  .title {
+    font-size: 1.5em;
+    margin: 5px 0;
+    letter-spacing: 1px;
+  }
+  
+  .subtitle {
+    font-size: 0.8em;
+    margin-bottom: 15px;
+  }
+  
+  #results-container {
+    padding: 8px 5px;
+    margin: 5px 0;
+  }
+  
+  .markdown-container {
+    padding: 15px 8px;
+  }
+}
+
+/* 使用相对单位替代固定像素 */
+@media (max-width: 768px) {
+  .pagination-controls {
+    margin-top: 0.5rem; /* 使用相对单位 */
+    gap: 0.3rem;
+  }
+  
+  .page-btn {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8em;
+  }
+}
+
+/* 优化图片容器的边距 */
+@media (max-width: 768px) {
+  #tab-panel-image {
+    padding: 15px 5px; /* 减少图片面板内边距 */
+    gap: 10px; /* 缩小元素间距 */
+  }
+  
+  .adaptive-img {
+    margin: 5px 0; /* 减少图片边距 */
+  }
+}
+
+/* ===== 数字分页样式（表格上方） ===== */
+.number-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.page-number {
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1em;
+  font-weight: 600;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  padding: 0 8px;
+}
+
+.page-number:hover:not(.current) {
+  background-color: var(--primary-glow);
+  color: var(--bg-color);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 217, 255, 0.3);
+}
+
+.page-number.current {
+  background: linear-gradient(45deg, var(--secondary-glow), var(--primary-glow));
+  color: #0a0e27;
+  border-color: transparent;
+  cursor: default;
+  font-weight: 700;
+}
+
+.page-number.ellipsis {
+  border: none;
+  cursor: default;
+  pointer-events: none;
+  opacity: 0.5;
+  min-width: 24px;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .number-pagination {
+    gap: 5px;
+    margin-bottom: 15px;
+  }
+  
+  .page-number {
+    min-width: 32px;
+    height: 32px;
+    font-size: 0.9em;
+    padding: 0 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-number {
+    min-width: 28px;
+    height: 28px;
+    font-size: 0.85em;
+  }
+}
+
+/* ===== 选为场景链接样式 ===== */
+.scenario-link {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 4px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 0.85em;
+  font-weight: 400;
+  color: var(--text-color);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+
+.scenario-link:hover:not(.disabled) {
+  background-color: var(--secondary-glow);
+  border-color: var(--secondary-glow);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 42, 109, 0.3);
+}
+
+.scenario-link:active:not(.disabled) {
+  transform: translateY(0);
+}
+
+.scenario-link.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.scenario-link.loading {
+  position: relative;
+  color: transparent;
+  pointer-events: none;
+}
+
+.scenario-link.loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  margin-left: -8px;
+  margin-top: -8px;
+  border: 2px solid var(--text-color);
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spinner 0.8s linear infinite;
+}
+
+@keyframes spinner {
+  to { transform: rotate(360deg); }
+}
+
+.scenario-link.success {
+  background-color: var(--primary-glow) !important;
+  border-color: var(--primary-glow) !important;
+  color: #0a0e27 !important;
+  font-weight: 500;
+}
+
+.scenario-link.error {
+  border-color: var(--secondary-glow) !important;
+  color: var(--secondary-glow) !important;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .scenario-link {
+    font-size: 0.8em;
+    padding: 6px 2px;
+    margin-top: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .scenario-link {
+    font-size: 0.75em;
+    padding: 5px 2px;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- 状态变量 ---
+    let page = 1;
+    let total_count = 0;
+    let total_page = 0;
+    let page_size = 18;
+    let results = []; //角色列表
+    let currentKeywords = ''; // 当前搜索关键词
+
+    // --- 动态背景 ---
+    const streamContainer = document.getElementById('data-stream-effect');
+    if (streamContainer) {
+        const glyphs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>/?;:"|[]{}=+-_*&^%$#@!';
+        const createGlyph = () => {
+            const glyph = document.createElement('span');
+            glyph.className = 'glyph';
+            glyph.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+            glyph.style.left = Math.random() * 100 + 'vw';
+            glyph.style.animationDuration = Math.random() * 5 + 5 + 's';
+            glyph.style.animationDelay = Math.random() * 3 + 's';
+            streamContainer.appendChild(glyph);
+            setTimeout(() => { glyph.remove(); }, 10000);
+        };
+        setInterval(createGlyph, 100);
+    }
+
+    const resultsContainer = document.getElementById('results-container');
+    const paginationControls = document.getElementById('pagination-controls'); // 新增
+
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const curPage = document.getElementById('page-info');
+    
+    prevBtn.addEventListener('click', () => {
+        if (page > 1) {
+            page--;
+            updateDataUI();
+            updatePaginationControls();
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (page < total_page) {
+            page++;
+            updateDataUI();
+            updatePaginationControls();
+        }
+    });
+
+    // --- 数字分页逻辑 ---
+    const numberPaginationContainer = document.getElementById('number-pagination');
+    
+    const updateNumberPagination = () => {
+        if (!numberPaginationContainer || total_page <= 1) {
+            if (numberPaginationContainer) numberPaginationContainer.innerHTML = '';
+            return;
+        }
+        
+        let html = '';
+        
+        // 计算显示的页码范围（最多9个：当前页+前4个+后4个）
+        let startPage = Math.max(1, page - 4);
+        let endPage = Math.min(total_page, page + 4);
+        
+        // 调整范围确保最多显示9个
+        if (endPage - startPage + 1 < 9) {
+            if (startPage === 1) {
+                endPage = Math.min(total_page, startPage + 8);
+            } else if (endPage === total_page) {
+                startPage = Math.max(1, endPage - 8);
+            }
+        }
+        
+        // 生成页码链接
+        for (let i = startPage; i <= endPage; i++) {
+            if (i === page) {
+                // 当前页（不可点击）
+                html += `<span class="page-number current">${i}</span>`;
+            } else {
+                // 可点击的页码
+                html += `<a href="#" class="page-number" data-page="${i}">${i}</a>`;
+            }
+        }
+        
+        numberPaginationContainer.innerHTML = html;
+        
+        // 绑定点击事件
+        const pageLinks = numberPaginationContainer.querySelectorAll('a.page-number');
+        pageLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetPage = parseInt(link.getAttribute('data-page'));
+                if (targetPage !== page && targetPage >= 1 && targetPage <= total_page) {
+                    page = targetPage;
+                    updateDataUI();
+                    updatePaginationControls();
+                }
+            });
+        });
+    };
+
+    // --- 搜索功能 ---
+    const searchInput = document.getElementById('char-query');
+    const searchBtn = document.getElementById('search-btn');
+    const searchForm = document.getElementById('search-form');
+
+    // 搜索按钮点击事件
+    searchBtn.addEventListener('click', () => {
+        currentKeywords = searchInput.value;
+        updateDataUI();
+    });
+
+    // 表单提交事件（支持回车键）
+    searchForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        currentKeywords = searchInput.value;
+        updateDataUI();
+    });
+
+    // 输入框回车事件
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            currentKeywords = searchInput.value;
+            updateDataUI();
+        }
+    });
+
+    // 构建API URL，包含关键词参数
+    const buildApiUrl = (pageNum, pageSize) => {
+        let url = `https://danime.dawoai.com/v1/dialogue/character_list?page=${pageNum}&page_size=${pageSize}&query=notes&d=1`;
+        if (currentKeywords) {
+            url += `&keywords=${encodeURIComponent(currentKeywords)}`;
+        }
+        return url;
+    };
+
+    const updateDataUI = () => {
+        fetch(buildApiUrl(page, page_size))
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // 3. 更新UI
+                    results = data.data;
+                    total_count = data.total_count;
+                    //page = 1;
+                    total_page = data.total_pages;
+                    
+                    const char1 = document.getElementById('charillu1');
+                    const char2 = document.getElementById('charillu2');
+                    const char3 = document.getElementById('charillu3');
+                    const char4 = document.getElementById('charillu4');
+                    const char5 = document.getElementById('charillu5');
+                    const char6 = document.getElementById('charillu6');
+                    const char7 = document.getElementById('charillu7');
+                    const char8 = document.getElementById('charillu8');
+                    const char9 = document.getElementById('charillu9');
+                    const char10 = document.getElementById('charillu10');
+                    const char11 = document.getElementById('charillu11');
+                    const char12 = document.getElementById('charillu12');
+                    const char13 = document.getElementById('charillu13');
+                    const char14 = document.getElementById('charillu14');
+                    const char15 = document.getElementById('charillu15');
+                    const char16 = document.getElementById('charillu16');
+                    const char17 = document.getElementById('charillu17');
+                    const char18 = document.getElementById('charillu18');
+                    const a1 = document.getElementById('chat_char1');
+                    const a2 = document.getElementById('chat_char2');
+                    const a3 = document.getElementById('chat_char3');
+                    const a4 = document.getElementById('chat_char4');
+                    const a5 = document.getElementById('chat_char5');
+                    const a6 = document.getElementById('chat_char6');
+                    const a7 = document.getElementById('chat_char7');
+                    const a8 = document.getElementById('chat_char8');
+                    const a9 = document.getElementById('chat_char9');
+                    const a10 = document.getElementById('chat_char10');
+                    const a11 = document.getElementById('chat_char11');
+                    const a12 = document.getElementById('chat_char12');
+                    const a13 = document.getElementById('chat_char13');
+                    const a14 = document.getElementById('chat_char14');
+                    const a15 = document.getElementById('chat_char15');
+                    const a16 = document.getElementById('chat_char16');
+                    const a17 = document.getElementById('chat_char17');
+                    const a18 = document.getElementById('chat_char18');
+                    
+                    // 获取链接元素
+                    const link1 = document.getElementById('scenario_link1');
+                    const link2 = document.getElementById('scenario_link2');
+                    const link3 = document.getElementById('scenario_link3');
+                    const link4 = document.getElementById('scenario_link4');
+                    const link5 = document.getElementById('scenario_link5');
+                    const link6 = document.getElementById('scenario_link6');
+                    const link7 = document.getElementById('scenario_link7');
+                    const link8 = document.getElementById('scenario_link8');
+                    const link9 = document.getElementById('scenario_link9');
+                    const link10 = document.getElementById('scenario_link10');
+                    const link11 = document.getElementById('scenario_link11');
+                    const link12 = document.getElementById('scenario_link12');
+                    const link13 = document.getElementById('scenario_link13');
+                    const link14 = document.getElementById('scenario_link14');
+                    const link15 = document.getElementById('scenario_link15');
+                    const link16 = document.getElementById('scenario_link16');
+                    const link17 = document.getElementById('scenario_link17');
+                    const link18 = document.getElementById('scenario_link18');
+
+                    if (data.count > 0) {
+                        char1.src = data.data[0].img_src;
+                        char1.title = data.data[0].text;
+                        a1.href = "https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[0].char_id);
+                        link1.href="https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[0].char_id) + "_as_scenario";
+                    } else {
+                        char1.src = '';
+                        char1.title = '';
+                        a1.href = '';
+                        link1.href = '';
+                    } 
+
+                    if (data.count > 1) {
+                        char2.src = data.data[1].img_src;
+                        char2.title = data.data[1].text;
+                        a2.href = "https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[1].char_id);
+                        link2.href="https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[1].char_id) + "_as_scenario";
+                    } else {
+                        char2.src = '';
+                        char2.title = '';
+                        a2.href = '';
+                        link2.href = '';
+                    }
+
+                    if (data.count > 2) {
+                        char3.src = data.data[2].img_src;
+                        char3.title = data.data[2].text;
+                        a3.href = "https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[2].char_id);
+                        link3.href="https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[2].char_id) + "_as_scenario";
+                    } else {
+                        char3.src = '';
+                        char3.title = '';
+                        a3.href = '';
+                        link3.href = '';
+                    }
+
+                    if (data.count > 3) {
+                        char4.src = data.data[3].img_src;
+                        char4.title = data.data[3].text;
+                        a4.href = "https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[3].char_id);
+                        link4.href="https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[3].char_id) + "_as_scenario";
+                    } else {
+                        char4.src = '';
+                        char4.title = '';
+                        a4.href = '';
+                        link4.href = '';
+                    }
+
+                    if (data.count > 4) {
+                        char5.src = data.data[4].img_src;
+                        char5.title = data.data[4].text;
+                        a5.href = "https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[4].char_id);
+                        link5.href="https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[4].char_id) + "_as_scenario";
+                    } else {
+                        char5.src = '';
+                        char5.title = '';
+                        a5.href = '';
+                        link5.href = '';
+                    }
+
+                    if (data.count > 5) {
+                        char6.src = data.data[5].img_src;
+                        char6.title = data.data[5].text;
+                        a6.href = "https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[5].char_id);
+                        link6.href="https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[5].char_id) + "_as_scenario";
+                    } else {
+                        char6.src = '';
+                        char6.title = '';
+                        a6.href = '';
+                        link6.href = '';
+                    }
+
+                    if (data.count > 6) {
+                        char7.src = data.data[6].img_src;
+                        char7.title = data.data[6].text;
+                        a7.href = "https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[6].char_id);
+                        link7.href="https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[6].char_id) + "_as_scenario";
+                    } else {
+                        char7.src = '';
+                        char7.title = '';
+                        a7.href = '';
+                        link7.href = '';
+                    }
+
+                    if (data.count > 7) {
+                        char8.src = data.data[7].img_src;
+                        char8.title = data.data[7].text;
+                        a8.href = "https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[7].char_id);
+                        link8.href="https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[7].char_id) + "_as_scenario";
+                    } else {
+                        char8.src = '';
+                        char8.title = '';
+                        a8.href = '';
+                        link8.href = '';
+                    }
+
+                    if (data.count > 8) {
+                        char9.src = data.data[8].img_src;
+                        char9.title = data.data[8].text;
+                        a9.href = "https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[8].char_id);
+                        link9.href="https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[8].char_id) + "_as_scenario";
+                    } else {
+                        char9.src = '';
+                        char9.title = '';
+                        a9.href = '';
+                        link9.href = '';
+                    }
+
+                    if (data.count > 9) {
+                        char10.src = data.data[9].img_src;
+                        char10.title = data.data[9].text;
+                        a10.href = "https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[9].char_id);
+                        link10.href="https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[9].char_id) + "_as_scenario";
+                    } else {
+                        char10.src = '';
+                        char10.title = '';
+                        a10.href = '';
+                        link10.href = '';
+                    }
+
+                    if (data.count > 10) {
+                        char11.src = data.data[10].img_src;
+                        char11.title = data.data[10].text;
+                        a11.href = "https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[10].char_id);
+                        link11.href="https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[10].char_id) + "_as_scenario";
+                    } else {
+                        char11.src = '';
+                        char11.title = '';
+                        a11.href = '';
+                        link11.href = '';
+                    }
+
+                    if (data.count > 11) {
+                        char12.src = data.data[11].img_src;
+                        char12.title = data.data[11].text;
+                        a12.href = "https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[11].char_id);
+                        link12.href="https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[11].char_id) + "_as_scenario";
+                    } else {
+                        char12.src = '';
+                        char12.title = '';
+                        a12.href = '';
+                        link12.href = '';
+                    }
+
+                    if (data.count > 12) {
+                        char13.src = data.data[12].img_src;
+                        char13.title = data.data[12].text;
+                        a13.href = "https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[12].char_id);
+                        link13.href="https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[12].char_id) + "_as_scenario";
+                    } else {
+                        char13.src = '';
+                        char13.title = '';
+                        a13.href = '';
+                        link13.href = '';
+                    }
+
+                    if (data.count > 13) {
+                        char14.src = data.data[13].img_src;
+                        char14.title = data.data[13].text;
+                        a14.href = "https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[13].char_id);
+                        link14.href="https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[13].char_id) + "_as_scenario";
+                    } else {
+                        char14.src = '';
+                        char14.title = '';
+                        a14.href = '';
+                        link14.href = '';
+                    }
+
+                    if (data.count > 14) {
+                        char15.src = data.data[14].img_src;
+                        char15.title = data.data[14].text;
+                        a15.href = "https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[14].char_id);
+                        link15.href="https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[14].char_id) + "_as_scenario";
+                    } else {
+                        char15.src = '';
+                        char15.title = '';
+                        a15.href = '';
+                        link15.href = '';
+                    }
+
+                    if (data.count > 15) {
+                        char16.src = data.data[15].img_src;
+                        char16.title = data.data[15].text;
+                        a16.href = "https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[15].char_id);
+                        link16.href="https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[15].char_id) + "_as_scenario";
+                    } else {
+                        char16.src = '';
+                        char16.title = '';
+                        a16.href = '';
+                        link16.href = '';
+                    }
+
+                    if (data.count > 16) {
+                        char17.src = data.data[16].img_src;
+                        char17.title = data.data[16].text;
+                        a17.href = "https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[16].char_id);
+                        link17.href="https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[16].char_id) + "_as_scenario";
+                    } else {
+                        char17.src = '';
+                        char17.title = '';
+                        a17.href = '';
+                        link17.href = '';
+                    }
+
+                    if (data.count > 17) {
+                        char18.src = data.data[17].img_src;
+                        char18.title = data.data[17].text;
+                        a18.href = "https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[17].char_id);
+                        link18.href="https://danime.dawoai.com/character/chat.html?char_id=" + encodeURIComponent(data.data[17].char_id) + "_as_scenario";
+                    } else {
+                        char18.src = '';
+                        char18.title = '';
+                        a18.href = '';
+                        link18.href = '';
+                    }
+
+                    updatePaginationControls();
+                    updateNumberPagination();
+                })
+                .catch(error => {
+                console.error('load character_list fail: ', error);
+                resultsContainer.style.display = 'none';
+                // 可以添加一个错误提示
+            });
+    };
+
+    updateDataUI();
+
+    // --- UI 更新函数 ---
+    const updatePaginationControls = () => {
+        if (total_page > 0) {
+            curPage.textContent = `第 ${page} / ${total_page} 页`;
+            prevBtn.disabled = page <= 1;
+            nextBtn.disabled = page >= total_page;
+        } else {
+            curPage.textContent = '';
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
+        }
+    };
+});
+</script>
+</head>
+
+<body>
+<div class="cookii-ui-wrapper">
+  <div id="data-stream-effect"></div>
+  <div class="container">
+    <!--<h1 class="title">CuddlyCuddle</h1>-->
+    <div class="container">
+      <!-- 搜索框区域 -->
+      <form class="search-form" id="search-form">
+        <input type="text" id="char-query" placeholder="猫娘" autocomplete="off">
+        <button type="button" id="search-btn">搜索</button>
+      </form>
+    </div>
+    <div id="results-container" style="display: block;">
+      
+      <!-- 数字分页（表格上方） -->
+      <div class="number-pagination" id="number-pagination"></div>
+      
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <a id="chat_char1" href="">
+                <img src="" id="charillu1" title="" />
+              </a>
+              <a href="#" class="scenario-link" id="scenario_link1">选为场景</a>
+            </td>
+            <td>
+              <a id="chat_char2" href="">
+                <img src="" id="charillu2" title=""/>
+              </a>
+              <a href="#" class="scenario-link" id="scenario_link2">选为场景</a>
+            </td>
+            <td>
+              <a id="chat_char3" href="">
+                <img src="" id="charillu3" title="" />
+              </a>
+              <a href="#" class="scenario-link" id="scenario_link3">选为场景</a>
+            </td>
+            <td>
+              <a id="chat_char4" href="">
+                <img src="" id="charillu4" title=""/>
+              </a>
+              <a href="#" class="scenario-link" id="scenario_link4">选为场景</a>
+            </td>
+            <td>
+              <a id="chat_char5" href="">
+                <img src="" id="charillu5" title="" />
+              </a>
+              <a href="#" class="scenario-link" id="scenario_link5">选为场景</a>
+            </td>
+            <td>
+              <a id="chat_char6" href="">
+                <img src="" id="charillu6" title=""/>
+              </a>
+              <a href="#" class="scenario-link" id="scenario_link6">选为场景</a>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a id="chat_char7" href="">
+                <img src="" id="charillu7" title="" />
+              </a>
+              <a href="#" class="scenario-link" id="scenario_link7">选为场景</a>
+            </td>
+            <td>
+              <a id="chat_char8" href="">
+                <img src="" id="charillu8" title=""/>
+              </a>
+              <a href="#" class="scenario-link" id="scenario_link8">选为场景</a>
+            </td>
+            <td>
+              <a id="chat_char9" href="">
+                <img src="" id="charillu9" title="" />
+              </a>
+              <a href="#" class="scenario-link" id="scenario_link9">选为场景</a>
+            </td>
+            <td>
+              <a id="chat_char10" href="">
+                <img src="" id="charillu10" title=""/>
+              </a>
+              <a href="#" class="scenario-link" id="scenario_link10">选为场景</a>
+            </td>
+            <td>
+              <a id="chat_char11" href="">
+                <img src="" id="charillu11" title="" />
+              </a>
+              <a href="#" class="scenario-link" id="scenario_link11">选为场景</a>
+            </td>
+            <td>
+              <a id="chat_char12" href="">
+                <img src="" id="charillu12" title=""/>
+              </a>
+              <a href="#" class="scenario-link" id="scenario_link12">选为场景</a>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a id="chat_char13" href="">
+                <img src="" id="charillu13" title="" />
+              </a>
+              <a href="#" class="scenario-link" id="scenario_link13">选为场景</a>
+            </td>
+            <td>
+              <a id="chat_char14" href="">
+                <img src="" id="charillu14" title=""/>
+              </a>
+              <a href="#" class="scenario-link" id="scenario_link14">选为场景</a>
+            </td>
+            <td>
+              <a id="chat_char15" href="">
+                <img src="" id="charillu15" title="" />
+              </a>
+              <a href="#" class="scenario-link" id="scenario_link15">选为场景</a>
+            </td>
+            <td>
+              <a id="chat_char16" href="">
+                <img src="" id="charillu16" title=""/>
+              </a>
+              <a href="#" class="scenario-link" id="scenario_link16">选为场景</a>
+            </td>
+            <td>
+              <a id="chat_char17" href="">
+                <img src="" id="charillu17" title="" />
+              </a>
+              <a href="#" class="scenario-link" id="scenario_link17">选为场景</a>
+            </td>
+            <td>
+              <a id="chat_char18" href="">
+                <img src="" id="charillu18" title=""/>
+              </a>
+              <a href="#" class="scenario-link" id="scenario_link18">选为场景</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="pagination-controls" id="pagination-controls">
+        <button id="prev-btn" class="page-btn" disabled>&lt; Prev</button>
+        <span id="page-info"></span>
+        <button id="next-btn" class="page-btn" disabled>Next &gt;</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
